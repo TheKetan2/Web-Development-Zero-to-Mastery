@@ -1,5 +1,8 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+
 const app = express();
+app.use(bodyParser.json());
 
 const database = {
   users: [
@@ -23,21 +26,25 @@ const database = {
 };
 
 app.get("/", (req, res) => {
-  res.json("This is working Get");
+  res.send("This is working Get");
 });
 
 app.post("/signin", (req, res) => {
-  res.json(req.body);
+  if (
+    req.body.email === database.users[0].email &&
+    req.body.password === database.users[0].password
+  ) {
+    res.json("Success");
+  } else {
+    res.json("Wrong credentials");
+  }
+});
+
+app.post("/register", (req, res) => {
+  database.users.push({ ...req.body, joined: new Date() });
+  res.json(database.users);
 });
 
 app.listen(3000, () => {
   console.log("Server Started at port number 3000");
 });
-
-/* 
-/signin --> POST = success/fail
-/register --> POST = user
-/profile/:userId --> GET = user
-/image --> PUT --> user
-/
-*/
