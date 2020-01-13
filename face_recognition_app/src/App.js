@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import "./App.css";
 import Navigation from "./components/navigation/navigation";
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
@@ -26,7 +26,7 @@ const particlesOptions = {
   }
 };
 
-class App extends Component {
+class App extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -34,9 +34,30 @@ class App extends Component {
       imgUrl: "",
       box: {},
       route: "signin",
-      isSignedIn: false
+      isSignedIn: false,
+      user: {
+        id: "",
+        name: "",
+        email: "",
+        password: "",
+        entries: 0,
+        joined: new Date()
+      }
     };
   }
+
+  loadUsers = user => {
+    this.setState({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        entries: 0,
+        joined: new Date()
+      }
+    });
+  };
 
   calculateFaceLocation = data => {
     const clarifaiFace =
@@ -66,12 +87,24 @@ class App extends Component {
 
   onInputSubmit = event => {
     this.setState({ imgUrl: this.state.input });
-    console.log("click");
     app.models
       .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-      .then(response =>
-        this.displayFacebox(this.calculateFaceLocation(response))
-      )
+      .then(response => {
+        if (response) {
+          fetch("http://localhost:3000/image", {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: this.state.user.id })
+          })
+            .then(response => response.json())
+            .then(count => {
+              this.setState({
+                user: { ...this.state.user, entries: count }
+              });
+            });
+        }
+        this.displayFacebox(this.calculateFaceLocation(response));
+      })
       .catch(err => console.log(err));
   };
 
@@ -93,14 +126,23 @@ class App extends Component {
           isSignedIn={this.state.isSignedIn}
         />
         {this.state.route === "signin" ? (
-          <Signin onRouteChange={this.onRouteChange} />
+          <Signin
+            onRouteChange={this.onRouteChange}
+            loadUser={this.loadUsers}
+          />
         ) : this.state.route === "register" ? (
-          <Register onRouteChange={this.onRouteChange} />
+          <Register
+            onRouteChange={this.onRouteChange}
+            loadUsers={this.loadUsers}
+          />
         ) : (
           <div>
             {" "}
             <Logo />
-            <Rank />
+            <Rank
+              name={this.state.user.name}
+              entries={this.state.user.entries}
+            />
             <ImageLinkForm
               onInputChange={this.onInputChange}
               onInputSubmit={this.onInputSubmit}
