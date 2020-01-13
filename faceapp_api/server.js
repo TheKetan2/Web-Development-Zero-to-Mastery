@@ -45,7 +45,7 @@ app.post("/signin", (req, res) => {
     req.body.email === database.users[0].email &&
     req.body.password === database.users[0].password
   ) {
-    res.json("success");
+    res.json(database.users[0]);
     console.log(database.users.length);
   } else {
     res.json("Wrong credentials");
@@ -71,7 +71,7 @@ app.post("/register", (req, res) => {
     id: Math.round(Math.random() * 9999).toString(),
     entries: 0
   });
-  res.json("success");
+  res.json(database.users[database.users.length - 1]);
 });
 
 app.get("/profile/:id", (req, res) => {
