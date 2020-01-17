@@ -36,7 +36,7 @@ app.post("/signin", (req, res) => {
           .from("users")
           .where("email", "=", req.body.email)
           .then(user => {
-            // console.log(user);
+            console.log(user);
             res.json(user[0]);
           })
           .catch(err => res.status(400).json("unable to get user"));
@@ -80,6 +80,7 @@ app.get("/profile/:id", (req, res) => {
     .where({ id: id })
     .then(user => {
       if (user.length) {
+        console.log(user[0]);
         res.json(user[0]);
       } else {
         res.status(400).json("Not found");
