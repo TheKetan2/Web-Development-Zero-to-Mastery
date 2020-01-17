@@ -1,3 +1,11 @@
+## Topics covered:
+
+- Nodejs
+- express
+- postgress
+- knex for interacting with postrgres
+- lot of reactjs
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
